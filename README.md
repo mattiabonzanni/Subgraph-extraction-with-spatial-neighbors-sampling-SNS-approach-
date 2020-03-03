@@ -7,101 +7,100 @@ Each folder contains:
 
                        Spatial Neighbors Sampling approach applied to unweighted and weighted Watts-Strogatz graph
 1) Given NG, k and beta (number nodes, average degree and re-wire probability, respectively), generate a Watts-Strogatz global network and calculate SWPG, CCG and PLG. ? were intentionally selected to achieve small-world networks; 
-% 2) Fix the percentage of nodes NS to extract (percentage); 
-% 3) Choose a seed node s of index i; 
-% 4) Extract all the nodes with an index ? [i; i+NS]. The edges are maintained if and only if both nodes are retained in the subgraph; 
-% 5) Calculate SWPS, CCS and PLS in the subgraph of dimension NS created in step3; 
-% 6) Repeat the process from step3 to step5 with the node of index i+1 until the index of the seed node is equal to i-1 (to extract all the NG subgraphs of dimension NS).
-   % INPUT:
-% NG= number of nodes in the WS Global Graph;
-% k= average degree in the WS Graph:
-% beta= re-wiring probability in the WS Graph:0.005/0.01/0.05 are used to generate Small world networks. 
-% percentage= percentage of node to retain in each subGraph. 
-    % OUTPUT:
-%DegreeSubGraph=degree subgraph
-%SWPG_values=values of SWP of the global graph 
-%SWPS_values= values of SWP of the subgraphs 
-%PercentageSubGraphsNodes= percentage of node to retain in each subGraph 
-%RegularCCG= Average Clustering Coef. value of the Lattice model of the global graph
-%NetCCG= Average Clustering Coef. value of the global graph 
-%RandCCG= Average Clustering Coef. value of the Random model of the global graph 
-%RegularCCS= Average Clustering Coef. value of the Lattice model of the subgraph  
-%NetCCS= Average Clustering Coef. value of the subgraph   
-%RandCCS= Average Clustering Coef. value of the Random model of the subgraph   
-%RegularPLG= Average Path length value of the Lattice model of the global graph  
-%NetPLG= Average Path length value of the global graph   
-%RandPLG= Average Path length value of the Random model of the global graph   
-%RegularPLS= Average Path length value of the Lattice model of the subgraph   
-%NetPLS= Average Path length value of the subgraph 
-%RandPLS= Average Path length value of the Random model of the subgraph
-% The aformentioned outputs + the inputs are structured in two tables:
-% 1) Final=single values at each iteration;
-% 2) FinalMean= mean values.
-    %Required Code(s):
-% 1) WattsStrogatz.m
-% 2) avg_clus_matrix (written by Eric Bridgeford);
-% 3) avg_path_matrix (written by Eric Bridgeford);
-% 4) clustering_coef_matrix (code originally written by Mika Rubinov,UNSW, 2007-2010 and modified/written by Eric Bridgeford);
-% 5) symm_matrix (written by Eric Bridgeford);
-% 6) regular_matrix_generator (written by Eric Bridgeford);
-% 7) randomize_matrix (written by Sarah F. Muldoon).
-    % written by Mattia Bonzanni
+2) Fix the percentage of nodes NS to extract (percentage); 
+3) Choose a seed node s of index i; 
+4) Extract all the nodes with an index ? [i; i+NS]. The edges are maintained if and only if both nodes are retained in the subgraph; 
+5) Calculate SWPS, CCS and PLS in the subgraph of dimension NS created in step3; 
+6) Repeat the process from step3 to step5 with the node of index i+1 until the index of the seed node is equal to i-1 (to extract all the NG subgraphs of dimension NS).
+   INPUT:
+NG= number of nodes in the WS Global Graph;
+k= average degree in the WS Graph:
+beta= re-wiring probability in the WS Graph:0.005/0.01/0.05 are used to generate Small world networks. 
+percentage= percentage of node to retain in each subGraph. 
+    OUTPUT:
+DegreeSubGraph=degree subgraph
+SWPG_values=values of SWP of the global graph 
+SWPS_values= values of SWP of the subgraphs 
+PercentageSubGraphsNodes= percentage of node to retain in each subGraph 
+RegularCCG= Average Clustering Coef. value of the Lattice model of the global graph
+NetCCG= Average Clustering Coef. value of the global graph 
+RandCCG= Average Clustering Coef. value of the Random model of the global graph 
+RegularCCS= Average Clustering Coef. value of the Lattice model of the subgraph  
+NetCCS= Average Clustering Coef. value of the subgraph   
+RandCCS= Average Clustering Coef. value of the Random model of the subgraph   
+RegularPLG= Average Path length value of the Lattice model of the global graph  
+NetPLG= Average Path length value of the global graph   
+RandPLG= Average Path length value of the Random model of the global graph   
+RegularPLS= Average Path length value of the Lattice model of the subgraph   
+NetPLS= Average Path length value of the subgraph 
+RandPLS= Average Path length value of the Random model of the subgraph
+The aformentioned outputs + the inputs are structured in two tables:
+1) Final=single values at each iteration;
+2) FinalMean= mean values.
+    Required Code(s):
+1) WattsStrogatz.m
+2) avg_clus_matrix (written by Eric Bridgeford);
+3) avg_path_matrix (written by Eric Bridgeford);
+4) clustering_coef_matrix (code originally written by Mika Rubinov,UNSW, 2007-2010 and modified/written by Eric Bridgeford);
+5) symm_matrix (written by Eric Bridgeford);
+6) regular_matrix_generator (written by Eric Bridgeford);
+7) randomize_matrix (written by Sarah F. Muldoon).
+ written by Mattia Bonzanni
     
                             Spatial Neighbors Sampling approach applied Distance-Dependent Model -DDM
 Generate the distance-dependent model (DDM) with small-world properties
-% Given NG nodes, arrange them randomly in a 2D space. The 2D space has x- and y-coordinates range between 0 and 1;
-% Assuming an inverse relationship between physical distance and edge strength (Muldoon, 2016), assign edge weights wij according to the euclidian distance dij between all the pairs of nodes as follows: w_ij=D_max-d_ij where Dmax=max{dij}. Each node will have NG-1 connections (except for the ij pair with distance d_ij equal to Dmax);
-% Eliminate connections with an edge weight below a weight threshold wt. wt is defined by the user. This step led to the spontaneous emergence of small-world networks;  
-% Randomly re-wire each edge with probability ? (edge weight is retained). The inclusion of a random re-wiring guarantees that the network is not solely constructed as a function of physical distance, yet without imposing any additional rule. Moreover, the introduction of the random re-wiring led to a similar profile previously found in Watts et al.,1999. 
-% Calculate SWPG, CCG and PLG.
-% Apply the SNS method to distance-dependent model (DDM) graphs generated by GenerateDDM.m
-% Fix a spatial parameter ? (rho) and a seed node s  of index i(InitalSeedNode);
-% Extract all the nodes with x coordinates ? [xs- ?; xs+ ?] and y coordinates ? [ys- ?; ys+ ?]. An edge ij is preserved if and only if both nodei and nodej are retained in the subgraph; 
-% Calculate SWPS, CCS and PLS of the subgraph created in the previous step;
-% Repeat the process from the last two steps with the node of index i+1 until the index of the seed node is equal to LastSeedNode.
-    % INPUTS
-% NG= number of nodes in the distance-dependent model (DDM) Global Graph;
-% edgeDensity= the percentage of NG nodes attached to a given node; 
-% beta= re-wiring probability in the WS Graph. If not specified, 0.05 is used to generate Small world networks. % rho= the spatial parameter used to select the subgraph area;
-% G= the final DDM Global Graph (generated by GenerateDDM.m) or any other graph;
-% rho= the spatial parameter used to select the subgraph area;
-% xcoord= a vector composed by the x-coordinates assigned to each node (generated by GenerateDDM.m or associated with the graph G);
-% ycoord= a vector composed by the y-coordinates assigned to each node (generated by GenerateDDM.m or associated with the graph G);
-% InitialSeedNode= the first node used as seed node for the extraction. If not specified, 1 is assumed as default;
-% LastSeedNode= the last node used as seed node for the extraction. If not specified, NG is assumed as default;
-    % OUTPUT from GenerateDDM.m:
-% 1) G= the final DDM Global Graph;
-% 2) MatrixG= the adjacency matrix of graph G;
-% 3) xcoord= a vector composed by the random x-coordinates assigned to each node;
-% 4) ycoord= a vector composed by the random y-coordinates assigned to each node;
-% 5) The following outputs are structured in FinalGlobalGraph Table:
-% Degree=degree of the graph G;
-% wt=calculated weight thresholdto achieve the desired edge density;
-% SWPG=value of SWP of the Global graph 
-% RegularCCG= Average Clustering Coef. value of the Lattice model of the Global graph
-% NetCCG= Average Clustering Coef. value of the Global graph 
-% RandCCG= Average Clustering Coef. value of the Random model of the global graph 
-% RegularPLG= Average Path length value of the Lattice model of the Global graph  
-% NetPLG= Average Path length value of the Global graph   
-% RandPLG= Average Path length value of the Random model of the Global graph   
-    %OUTPUT from SNSDNN.m:
-% 1) The following values are structured in the FinalSubGraph table:
-% NodeID=the value of the node used as seed node;
-% DegreeSubGraph= degree of the subgraph;
-% FractionNodeSubGraph= the fraction of nodes exctract in the subgraph;
-% SWPS=value of SWP of the Global graph 
-% RegularCCS= Average Clustering Coef. values of the Lattice model of the subgraphs 
-% NetCCS= Average Clustering Coef. values of the subgraphs 
-% RandCCS= Average Clustering Coef. values of the Random model of the subgraphs 
-% RegularPLS= Average Path length values of the Lattice model of the subgraphs  
-% NetPLS= Average Path length values of the subgraphs   
-% RandPLS= Average Path length values of the Random model of the subgraphs
-    % Required codes:
-% 1) avg_clus_matrix (written by Eric Bridgeford);
-% 2) avg_path_matrix (written by Eric Bridgeford);
-% 3) clustering_coef_matrix (code originally written by Mika Rubinov,UNSW, 2007-2010 and modified/written by Eric Bridgeford);
-% 4) latmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU);
-% 5) randmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU);
-
-% Written by Mattia Bonzanni and Kimberly M. Bockley
+Given NG nodes, arrange them randomly in a 2D space. The 2D space has x- and y-coordinates range between 0 and 1;
+Assuming an inverse relationship between physical distance and edge strength (Muldoon, 2016), assign edge weights wij according to the euclidian distance dij between all the pairs of nodes as follows: w_ij=D_max-d_ij where Dmax=max{dij}. Each node will have NG-1 connections (except for the ij pair with distance d_ij equal to Dmax);
+Eliminate connections with an edge weight below a weight threshold wt. wt is defined by the user. This step led to the spontaneous emergence of small-world networks;  
+Randomly re-wire each edge with probability ? (edge weight is retained). The inclusion of a random re-wiring guarantees that the network is not solely constructed as a function of physical distance, yet without imposing any additional rule. Moreover, the introduction of the random re-wiring led to a similar profile previously found in Watts et al.,1999. 
+Calculate SWPG, CCG and PLG.
+Apply the SNS method to distance-dependent model (DDM) graphs generated by GenerateDDM.m
+Fix a spatial parameter ? (rho) and a seed node s  of index i(InitalSeedNode);
+Extract all the nodes with x coordinates ? [xs- ?; xs+ ?] and y coordinates ? [ys- ?; ys+ ?]. An edge ij is preserved if and only if both nodei and nodej are retained in the subgraph; 
+Calculate SWPS, CCS and PLS of the subgraph created in the previous step;
+Repeat the process from the last two steps with the node of index i+1 until the index of the seed node is equal to LastSeedNode.
+   INPUTS
+NG= number of nodes in the distance-dependent model (DDM) Global Graph;
+edgeDensity= the percentage of NG nodes attached to a given node; 
+beta= re-wiring probability in the WS Graph. If not specified, 0.05 is used to generate Small world networks. % rho= the spatial parameter used to select the subgraph area;
+G= the final DDM Global Graph (generated by GenerateDDM.m) or any other graph;
+rho= the spatial parameter used to select the subgraph area;
+xcoord= a vector composed by the x-coordinates assigned to each node (generated by GenerateDDM.m or associated with the graph G);
+ycoord= a vector composed by the y-coordinates assigned to each node (generated by GenerateDDM.m or associated with the graph G);
+InitialSeedNode= the first node used as seed node for the extraction. If not specified, 1 is assumed as default;
+LastSeedNode= the last node used as seed node for the extraction. If not specified, NG is assumed as default;
+    OUTPUT from GenerateDDM.m:
+1) G= the final DDM Global Graph;
+2) MatrixG= the adjacency matrix of graph G;
+3) xcoord= a vector composed by the random x-coordinates assigned to each node;
+4) ycoord= a vector composed by the random y-coordinates assigned to each node;
+5) The following outputs are structured in FinalGlobalGraph Table:
+Degree=degree of the graph G;
+wt=calculated weight thresholdto achieve the desired edge density;
+SWPG=value of SWP of the Global graph 
+RegularCCG= Average Clustering Coef. value of the Lattice model of the Global graph
+NetCCG= Average Clustering Coef. value of the Global graph 
+RandCCG= Average Clustering Coef. value of the Random model of the global graph 
+RegularPLG= Average Path length value of the Lattice model of the Global graph  
+NetPLG= Average Path length value of the Global graph   
+RandPLG= Average Path length value of the Random model of the Global graph   
+  OUTPUT from SNSDNN.m:
+1) The following values are structured in the FinalSubGraph table:
+NodeID=the value of the node used as seed node;
+DegreeSubGraph= degree of the subgraph;
+FractionNodeSubGraph= the fraction of nodes exctract in the subgraph;
+SWPS=value of SWP of the Global graph 
+RegularCCS= Average Clustering Coef. values of the Lattice model of the subgraphs 
+NetCCS= Average Clustering Coef. values of the subgraphs 
+RandCCS= Average Clustering Coef. values of the Random model of the subgraphs 
+RegularPLS= Average Path length values of the Lattice model of the subgraphs  
+NetPLS= Average Path length values of the subgraphs   
+RandPLS= Average Path length values of the Random model of the subgraphs
+  Required codes:
+1) avg_clus_matrix (written by Eric Bridgeford);
+2) avg_path_matrix (written by Eric Bridgeford);
+3) clustering_coef_matrix (code originally written by Mika Rubinov,UNSW, 2007-2010 and modified/written by Eric Bridgeford);
+4) latmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU);
+5) randmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU);
+Written by Mattia Bonzanni and Kimberly M. Bockley
 
