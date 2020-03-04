@@ -1,22 +1,22 @@
-function [G MatrixG xcoord ycoord FinalGlobalGraph]=GenerateDDM(NG,edgeDensity,beta)                                                            
+function [G MatrixG xcoord ycoord FinalGlobalGraph]=GenerateDDM(NG)                                                            
 %% Generate the distance-dependent model (DDM) with small-world properties
 % Given NG nodes, arrange them randomly in a 2D space. The 2D space has x- and y-coordinates range between 0 and 1;
 % Assuming an inverse relationship between physical distance and edge strength (Muldoon, 2016), assign edge weights wij according to the euclidian distance dij between all the pairs of nodes as follows: w_ij=D_max-d_ij where Dmax=max{dij}. Each node will have NG-1 connections (except for the ij pair with distance d_ij equal to Dmax);
 % Eliminate connections with an edge weight below a weight threshold wt. wt is defined by the user to achive the desired edge density. This step led to the spontaneous emergence of small-world networks;  
-% Randomly re-wire each edge with probability ? (edge weight is retained). The inclusion of a random re-wiring guarantees that the network is not solely constructed as a function of physical distance, yet without imposing any additional rule. Moreover, the introduction of the random re-wiring led to a similar profile previously found in Watts et al.,1999. 
+% Randomly re-wire each edge with probability beta (edge weight is retained). The inclusion of a random re-wiring guarantees that the network is not solely constructed as a function of physical distance, yet without imposing any additional rule. Moreover, the introduction of the random re-wiring led to a similar profile previously found in Watts et al.,1999. 
 % Calculate SWPG, CCG and PLG.
     % INPUTS
 % NG= number of nodes in the distance-dependent model (DDM) Global Graph;
 % edgeDensity= the percentage of NG nodes attached to a given node in the Global graph.  If not specified, 8 is used (She et al., 2016);
-% beta= re-wiring probability in the WS Graph. If not specified, 0.05 is used to generate Small world networks. 
+% beta= re-wiring probability in the WS Graph. If not specified, 0.05 is used to generate a small world networks. 
     % OUTPUT:
 % 1) G= the final DDM Global Graph;
 % 2) MatrixG= the adjacency matrix of graph G;
 % 3) xcoord= a vector composed by the random x-coordinates assigned to each node;
 % 4) ycoord= a vector composed by the random y-coordinates assigned to each node;
-% 5) The following outputs are structured in FinalGlobalGraph Table:
+% 5) The following outputs are structured in the FinalGlobalGraph table:
 % Degree=degree of the graph G;
-% wt=calculated weight thresholdto achieve the desired edge density;
+% wt=calculated weight threshold to achieve the desired edge density;
 % SWPG=value of SWP of the Global graph 
 % RegularCCG= Average Clustering Coef. value of the Lattice model of the Global graph
 % NetCCG= Average Clustering Coef. value of the Global graph 
@@ -32,6 +32,18 @@ function [G MatrixG xcoord ycoord FinalGlobalGraph]=GenerateDDM(NG,edgeDensity,b
 % 5) randmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU);
     % Written by Mattia Bonzanni and Kimberly M. Bockley
 %% Create DDN graph
+edgeDensity=input('Do you want to set the edge density of the global graph?[y/n]\n','s')
+if edgeDensity== 'y'
+    edgeDensity=input('Choose the the edge density:');
+else
+    edgeDensity=8;                                              % default value 
+end
+beta=input('Do you want to set  beta (rewiring probability)?[y/n]\n','s')
+if beta== 'y'
+    beta=input('Choose beta:');
+else
+    beta=0.05;                                                  % default value 
+end
 xcoord=rand(1,NG);                                              % x-axis coordinates between [0;1]
 ycoord=rand(1,NG);                                              % y-axis coordinates between [0;1]
 nodeIds=1:NG;
@@ -48,9 +60,7 @@ distMatrix=distMatrix-(max(distMatrix,[],'all'));               % to have closer
 distMatrix=distMatrix./min(distMatrix,[],'all');                % to range every between [0;1]. It follows that we can have the threshold's range [0;1].
 wt=0.1;                                                         % initial value of wt; the value will be updated until reaching the desired edge density
 Degree=NG*(NG-1);
-if edgeDensity==[]                                              % if edgeDensity is not decleared, 8 is set as default value, as previously reported in She et al.,2016 'Evaluating the Small-World-Ness of a Sampled Network: Functional Connectivity of Entorhinal-Hippocampal Circuitry' 
-    edgeDensity=8;
-end
+wtincrement=0.001;                                              % arbitrarly defined increment of wt for the iteration
 while Degree>(2*edgeDensity*NG)/100                             % to identify the value of wt necessary to achieve the desired edge density
     distMatrix(distMatrix<=wt)=0;                               % to threshold the matrix in order to eliminate edges from nodes ij given the distance(ij)<threshold. 
     distMatrix = distMatrix - diag(diag(distMatrix));           % to eliminate self-loops (0 values on the diagonal)
@@ -59,21 +69,18 @@ while Degree>(2*edgeDensity*NG)/100                             % to identify th
     weights=A.Edges.Weight(findedge(A,s,t));                    % to extract the edgeWeights table of the nodes pair
     NodeDegree=degree(A);                                       
     Degree=mean(NodeDegree);
-    wt=wt+0.001;
+    wt=wt+wtincrement;
     fprintf('wt=%.3f\n',wt);
 end
-wt=wt-0.001;
+wt=wt-wtincrement;
 %% Re-wire edges keeping the Edge weights
-if beta==[]                                                     % if beta is not decleared, 0.05 is set as default value. 
-    beta=0.05;
-end
 source=rand(size(t,1),1);                                       % to generate random numbers between [0;1]; we need to generate as many as are the edges, thus I need to have size of table t
 source(source<=beta)=1;                                         % to generate logic 1 values for numbers with probability equal or smaller than beta
 source(source<1)=0;                                             % to generate logic 0 values for numbers with probability larger than beta
 nodesToRewire=find(source);                                     % to find the index positions of the logic 1 values
 howManyToRewire=size(nodesToRewire,1);                          % to find how many edges will be rewired
 for q=1:howManyToRewire
-    g=graph(s,t);                                               % creating the graph in the loop allows me to consider at every iteration the new targets for s in order to avoid multiple edges between pairs of nodes
+    g=graph(s,t);                                               % creating the graph in the loop allows to consider at every iteration the new targets for s in order to avoid multiple edges between pairs of nodes
     AllTargets=(1:NG);                                          % to list all the nodes
     position=nodesToRewire(q,1);                                % to substitute an edge in t using the position based on nodesToRewire
     nodeS=s(position,1);
