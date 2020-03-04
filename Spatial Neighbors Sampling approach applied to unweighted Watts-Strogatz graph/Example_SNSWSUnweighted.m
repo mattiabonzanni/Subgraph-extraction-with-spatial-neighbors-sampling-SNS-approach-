@@ -44,7 +44,7 @@
 %% Example
 clear
 clc
-NG=100;             % number of nodes in the global WS graph
+NG=1000;             % number of nodes in the global WS graph
 k=15;               % mean node degree 2*K
 beta=0.05;          % rewiring probability
 percentage=15;      % percentage of nodes to extract 
