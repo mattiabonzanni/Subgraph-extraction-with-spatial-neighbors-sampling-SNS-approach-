@@ -1,33 +1,35 @@
-function [Final FinalMean]=SNSWSUnweighted(NG, k, beta, percentage)                         
-%% SNS method applied to Unweighted Watts-Strogatz graphs
-% 1) Given NG, k and beta (number nodes, average degree and re-wire probability, respectively), generate a Watts-Strogatz global network and calculate SWPG, CCG and PLG. ? were intentionally selected to achieve small-world networks; 
+function [Final FinalMean]=SNSWSUnweighted(NG, k, beta, percentage,InitialSeedNode, LastSeedNode)                         
+%% SNS method applied to Unweighted Watts-Strogatz (WS) graphs
+% 1) Given NG, k and beta (number nodes, average degree and re-wire probability, respectively), generate a Watts-Strogatz global network and calculate SWPG, CCG and PLG. beta is intentionally selected to achieve small-world networks; 
 % 2) Fix the percentage of nodes NS to extract (percentage); 
 % 3) Choose a seed node s of index i; 
-% 4) Extract all the nodes with an index ? [i; i+NS]. The edges are maintained if and only if both nodes are retained in the subgraph; 
-% 5) Calculate SWPS, CCS and PLS in the subgraph of dimension NS created in step3; 
-% 6) Repeat the process from step3 to step5 with the node of index i+1 until the index of the seed node is equal to i-1 (to extract all the NG subgraphs of dimension NS).
+% 4) Extract all the nodes with an index in the range [i; i+NS]. The edges are maintained if and only if both nodes are retained in the subgraph; 
+% 5) Calculate SWPS, CCS and PLS in the subgraph of dimension NS created in the previous step; 
+% 6) Repeat the process (last three steps) with the node of index i+1 until the index of the seed node is equal to i-1 (to extract all the NG subgraphs of dimension NS).
    % INPUT:
 % NG= number of nodes in the WS Global Graph;
 % k= average degree in the WS Graph:
-% beta= re-wiring probability in the WS Graph:0.005/0.01/0.05 are used to generate Small world networks. 
-% percentage= percentage of node to retain in each subGraph. 
+% beta= re-wiring probability in the WS Graph. 0.005/0.01/0.05 are used to generate Small world networks. 
+% percentage= percentage of node to retain in each subGraph;
+% InitialSeedNode= the first node used as seed node for the extraction. If not specified, 1 is assumed as default;
+% LastSeedNode= the last node used as seed node for the extraction. If not specified, NG is assumed as default;
     % OUTPUT:
-%DegreeSubGraph=degree subgraph
-%SWPG_values=values of SWP of the global graph 
-%SWPS_values= values of SWP of the subgraphs 
-%PercentageSubGraphsNodes= percentage of node to retain in each subGraph 
-%RegularCCG= Average Clustering Coef. value of the Lattice model of the global graph
-%NetCCG= Average Clustering Coef. value of the global graph 
-%RandCCG= Average Clustering Coef. value of the Random model of the global graph 
-%RegularCCS= Average Clustering Coef. value of the Lattice model of the subgraph  
-%NetCCS= Average Clustering Coef. value of the subgraph   
-%RandCCS= Average Clustering Coef. value of the Random model of the subgraph   
-%RegularPLG= Average Path length value of the Lattice model of the global graph  
-%NetPLG= Average Path length value of the global graph   
-%RandPLG= Average Path length value of the Random model of the global graph   
-%RegularPLS= Average Path length value of the Lattice model of the subgraph   
-%NetPLS= Average Path length value of the subgraph 
-%RandPLS= Average Path length value of the Random model of the subgraph
+%DegreeSubGraph=degree subgraph;
+%SWPG_values=values of SWP of the global graphs; 
+%SWPS_values= values of SWP of the subgraphss 
+%PercentageSubGraphsNodes= percentage of node retained in each subGraph; 
+%RegularCCG= Average Clustering Coef. values of the Lattice model of the global graphs;
+%NetCCG= Average Clustering Coef. values of the global graphs; 
+%RandCCG= Average Clustering Coef. values of the Random model of the global graphs; 
+%RegularCCS= Average Clustering Coef. value of the Lattice model of the subgraphs;  
+%NetCCS= Average Clustering Coef. values of the subgraphs;   
+%RandCCS= Average Clustering Coef. values of the Random model of the subgraphs;   
+%RegularPLG= Average Path length values of the Lattice model of the global graphs;  
+%NetPLG= Average Path length values of the global graphs;   
+%RandPLG= Average Path length values of the Random model of the global graphs;   
+%RegularPLS= Average Path length values of the Lattice model of the subgraphs   
+%NetPLS= Average Path length values of the subgraphs; 
+%RandPLS= Average Path length values of the Random model of the subgraphs;
 % The aformentioned outputs + the inputs are structured in two tables:
 % 1) Final=single values at each iteration;
 % 2) FinalMean= mean values.
@@ -42,32 +44,37 @@ function [Final FinalMean]=SNSWSUnweighted(NG, k, beta, percentage)
     % written by Mattia Bonzanni
 
 %% Create Tables
-nodeFraction=ceil(NG*percentage/100);               %to calculate the node's fraction
-Parameters=array2table([NG k beta nodeFraction]);
-TableSWP1 = cell(NG, 2);
-TableSWP2 = cell(NG, 2);
-TableVertex = cell(NG, 2);
-TableNodeId = cell(NG, 2);
-TableMeanDegreeSubH =cell(NG, 2);
-TablePercentageSubGraphNodes=cell(NG, 2);
-TableRegCC1=cell(NG, 2);
-TableNetCC1=cell(NG, 2);
-TableRandCC1=cell(NG, 2);
-TableRegCC2=cell(NG, 2);
-TableNetCC2=cell(NG, 2);
-TableRandCC2=cell(NG, 2);
-TableRegPL1=cell(NG, 2);
-TableNetPL1=cell(NG, 2);
-TableRandPL1=cell(NG, 2);
-TableRegPL2=cell(NG, 2);
-TableNetPL2=cell(NG, 2);
-TableRandPL2=cell(NG, 2);
-Tablenodes=cell(NG, 2);
+nodeFraction=ceil(NG*percentage/100);               % to calculate the node's fraction
+Parameters=array2table([NG k beta nodeFraction]);   % to store the used inputs
+if nargin<5                                         % if not decleared, initial node is 1 and last node is NG. Namely, it extracts all the subgraphs. 
+   InitialSeedNode=1;
+   LastSeedNode=NG;
+end
+NumberSeeds=LastSeedNode-InitialSeedNode+1;
+TableSWP1 = cell(NumberSeeds, 2);
+TableSWP2 = cell(NumberSeeds, 2);
+TableVertex = cell(NumberSeeds, 2);
+TableNodeId = cell(NumberSeeds, 2);
+TableMeanDegreeSubH =cell(NumberSeeds, 2);
+TablePercentageSubGraphNodes=cell(NumberSeeds, 2);
+TableRegCC1=cell(NumberSeeds, 2);
+TableNetCC1=cell(NumberSeeds, 2);
+TableRandCC1=cell(NumberSeeds, 2);
+TableRegCC2=cell(NumberSeeds, 2);
+TableNetCC2=cell(NumberSeeds, 2);
+TableRandCC2=cell(NumberSeeds, 2);
+TableRegPL1=cell(NumberSeeds, 2);
+TableNetPL1=cell(NumberSeeds, 2);
+TableRandPL1=cell(NumberSeeds, 2);
+TableRegPL2=cell(NumberSeeds, 2);
+TableNetPL2=cell(NumberSeeds, 2);
+TableRandPL2=cell(NumberSeeds, 2);
+Tablenodes=cell(NumberSeeds, 2);
 %% Generate a Watts-Strogatz graph and a subgraph with defined distance across all the nodes
 
 h=WattsStrogatz(NG,k,beta);                  % Generate a Watts-Strogatz graph - G(h)
 degreeG=degree(h);                           % degree of global graph
-MatrixGraph=full(adjacency(h));                     % Adj. Matrix of G(h)
+MatrixGraph=full(adjacency(h));              % Adj. Matrix of G(h)
 %% SWP WS Graph
 if sum(sum(MatrixGraph)) > 0    
 bin_matrix = 0;
@@ -134,19 +141,19 @@ delta_C1=diff_clus1;
 delta_L1=diff_path1;
 end
 %% Extract all the SubGraphs and compute SWP
-for i=1:NG
-% Extract all the nodes with an index: [i; i+nodeFraction]. The edges are maintained if and only if both nodes are retained in the subgraph; 
+for i=InitialSeedNode:LastSeedNode
+% Extract all the nodes with an index in the range [i; i+nodeFraction]. The edges are maintained if and only if both nodes are retained in the subgraph; 
 Vertex=i;
-nodeIDs=[Vertex:Vertex+nodeFraction];                         %to create a list of consecutive edges from Vertex to Vertex+Subnodes
-indexesToReplace = nodeIDs > NG;                              %if Vertex+Subnodes>N, the next neighborn node is Vertex+Subnodes-N
+nodeIDs=[Vertex:Vertex+nodeFraction];                         % to create a list of consecutive edges from Vertex to Vertex+Subnodes
+indexesToReplace = nodeIDs > NG;                              % if Vertex+Subnodes>N, the next neighborn node is Vertex+Subnodes-N
 nodeIDs(indexesToReplace) = nodeIDs(indexesToReplace)-NG;
 sizeSubGraph=size(nodeIDs);
 NodesSubGraph=sizeSubGraph(1,2);
 ArraySubgraph=reshape(nodeIDs',1,[]);
-SubH=subgraph(h,ArraySubgraph);                               %To generate a subGraph using the array "nodeIDs"
-MeanDegree_SubH=mean(degree(SubH));                            %To calculate mean degree of each subgraphs
-MatrixSub=full(adjacency(SubH));
-                                                                    %%  SWP SubGraphs
+SubH=subgraph(h,ArraySubgraph);                               % To generate a subGraph SubH using the array "nodeIDs"
+MeanDegree_SubH=mean(degree(SubH));                           % To calculate mean degree of each subgraphs
+MatrixSub=full(adjacency(SubH));                              % To create the adj matrix of subgraph SubH  
+%%  SWP SubGraphs
 if sum(sum(MatrixSub)) > 0    
 bin_matrix = 0;
 if strcmp('o','bin') == 1
