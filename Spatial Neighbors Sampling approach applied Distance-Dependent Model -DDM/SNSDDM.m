@@ -30,21 +30,13 @@ function [FinalSubGraph]=SNSDDM(G,rho, xcoord, ycoord, NG, InitialSeedNode, Last
 % 4) latmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU);
 % 5) randmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU);
     % Written by Mattia Bonzanni
-%% To create empty tables
+
 if nargin<6                                                                 % if not decleared, initial node is 1 and last node is NG. Namely, it extracts all the subgraphs. 
    InitialSeedNode=1;
    LastSeedNode=NG;
 end
 NumberSeeds=LastSeedNode-InitialSeedNode+1;
-TableSWPS = cell(NumberSeeds, 2);
-TableMeanDegreeSubH =cell(NumberSeeds, 2);
-TableRegCCS=cell(NumberSeeds, 2);
-TableNetCCS=cell(NumberSeeds, 2);
-TableRandCCS=cell(NumberSeeds, 2);
-TableRegPLS=cell(NumberSeeds, 2);
-TableNetPLS=cell(NumberSeeds, 2);
-TableRandPLS=cell(NumberSeeds, 2);
-TableSubNodes=cell(NumberSeeds, 2);
+S=zeros(NumberSeeds,10);                                                    % preallocation matrix
 %% SubGraph extraction and analyis
 for i=InitialSeedNode:LastSeedNode                                          % to select the fraction of nodes as seed node         
     fprintf('Node:%d\n',i)
@@ -71,9 +63,11 @@ for i=InitialSeedNode:LastSeedNode                                          % to
     NetCCsub=avg_clus_matrix(Subgraph, 'O'); 
     NetLsub=avg_path_matrix(1./Subgraph);
     Rsub=Subgraph;
-    Iter=200;                                                               % arbitrarly set to 200
+    Iter=200;                                                               % arbitrarly set at 200
     RandomMatrixsub= randmio_und_connected(Rsub, Iter);
+    fprintf('   Randomization of the subgraph (seed node %i) is completed.\n',i);
     LatticeMatrixsub= latmio_und_connected(Rsub,Iter);
+    fprintf('      Latticization of the subgraph (seed node %i) is completed.\n',i);
     RandCCsub= avg_clus_matrix(RandomMatrixsub, 'O');
     LattCCsub= avg_clus_matrix(LatticeMatrixsub, 'O');
     RandLsub=avg_path_matrix(1./RandomMatrixsub);
@@ -101,41 +95,12 @@ for i=InitialSeedNode:LastSeedNode                                          % to
     if diff_clus2 > 1
         diff_clus2 = 1;
     end
-    
     SWPS = 1 - (sqrt(diff_clus2^2 + diff_path2^2)/sqrt(2));
-    TableSWPS(i, :) = {i SWPS};
-    TableMeanDegreeSubH (i, :)={i MeanDegree_Sub};
-    TableRegCCS (i, :) = {i LattCCsub};
-    TableNetCCS (i, :) = {i NetCCsub};
-    TableRandCCS (i,:) = {i RandCCsub};
-    TableRegPLS (i, :) = {i LatticeLsub};
-    TableNetPLS (i, :) = {i NetLsub};
-    TableRandPLS (i,:) = {i RandLsub};
-    TableSubNodes (i,:) = {i FractionNodeSubGraph};
+    subData = [i MeanDegree_Sub FractionNodeSubGraph SWPS LattCCsub NetCCsub RandCCsub LatticeLsub NetLsub RandLsub];
+    S(i-InitialSeedNode+1,:)=subData;
 end
-%% Compile Tables
-Table2 = cell2mat(TableSWPS);
-Table3= cell2mat(TableMeanDegreeSubH);
-Table8=cell2mat(TableRegCCS);
-Table9=cell2mat(TableNetCCS);
-Table10=cell2mat(TableRandCCS);
-Table14=cell2mat(TableRegPLS);
-Table15=cell2mat(TableNetPLS);
-Table16=cell2mat(TableRandPLS);
-Table1=cell2mat(TableSubNodes);
-NodeID=Table2(: , 1);
-FractionNodeSubGraph=Table1(: , 2);
-SWPS=Table2(: , 2);
-DegreeSubGraph=Table3(: , 2);
-RegularCCS=Table8(: , 2);
-NetCCS=Table9(: , 2);
-RandCCS=Table10(: , 2);
-RegularPLS=Table14(: , 2);
-NetPLS=Table15(: , 2);
-RandPLS=Table16(: , 2);
 %% Output
-S = [NodeID DegreeSubGraph FractionNodeSubGraph SWPS RegularCCS NetCCS RandCCS RegularPLS NetPLS RandPLS];
 FinalSubGraph=array2table(full(S));
 FinalSubGraph.Properties.VariableNames = {'NodeID' 'DegreeSubGraph' 'FractionNodeSubGraph' 'SWPS' 'RegularCCS' 'NetCCS' 'RandCCS' 'RegularPLS' 'NetPLS' 'RandPLS'};
-m2 = msgbox('SubGraphs Extraction Completed using %d and %d as initial and last seeding nodes, respectively',InitialSeedNode,LastSeedNode);
+m2 = msgbox('SubGraphs Extraction Completed');
 end
