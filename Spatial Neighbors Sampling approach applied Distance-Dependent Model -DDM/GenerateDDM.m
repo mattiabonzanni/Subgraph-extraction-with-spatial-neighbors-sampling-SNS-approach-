@@ -95,9 +95,11 @@ MatrixG=full(adjacency(G,'weighted'));                          % re-wired matri
 NetCCG=avg_clus_matrix(MatrixG, 'O'); 
 NetPLG=avg_path_matrix(1./MatrixG);
 RGlob=MatrixG;
-Iter=200;
+Iter=200;                                                       % arbitrarly set at 200
 RandomMatrixG= randmio_und_connected(RGlob, Iter);
+fprintf('   Randomization of the Graph is completed.\n');
 RegularMatrixG= latmio_und_connected(RGlob,Iter);
+fprintf('      Latticization of the Graph is completed.\n');
 RandCCG= avg_clus_matrix(RandomMatrixG, 'O');
 RegularCCG= avg_clus_matrix(RegularMatrixG, 'O');
 RandPLG=avg_path_matrix(1./RandomMatrixG);
@@ -127,7 +129,7 @@ if diff_clus > 1
 end
 
 SWPG = 1 - (sqrt(diff_clus^2 + diff_path^2)/sqrt(2));
-
+%% Output
 S = [NG beta Degree wt SWPG RegularCCG NetCCG RandCCG RegularPLG NetPLG RandPLG];
 FinalGlobalGraph=array2table(full(S));
 FinalGlobalGraph.Properties.VariableNames = {'NG' 'Beta' 'DegreeGlobalGraph' 'wt' 'SWPS_values' 'RegularCCS' 'NetCCS' 'RandCCS' 'RegularPLS' 'NetPLS' 'RandPLS'};
