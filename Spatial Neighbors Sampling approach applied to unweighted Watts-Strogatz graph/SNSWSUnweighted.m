@@ -3,7 +3,7 @@ function [Final FinalMean]=SNSWSUnweighted(NG, k, beta, percentage,InitialSeedNo
 % 1) Given NG, k and beta (number nodes, average degree and re-wire probability, respectively), generate a Watts-Strogatz global network and calculate SWPG, CCG and PLG. beta is intentionally selected to achieve small-world networks; 
 % 2) Fix the percentage of nodes NS to extract (percentage); 
 % 3) Choose a seed node s of index i; 
-% 4) Extract all the nodes with an index in the range [i; i+NS]. The edges are maintained if and only if both nodes are retained in the subgraph; 
+% 4) Extract all the nodes with an index in the range [i; i+NS-1]. The edges are maintained if and only if both nodes are retained in the subgraph; 
 % 5) Calculate SWPS, CCS and PLS in the subgraph of dimension NS created in the previous step; 
 % 6) Repeat the process (last three steps) with the node of index i+1 until the index of the seed node is equal to i-1 (to extract all the NG subgraphs of dimension NS).
    % INPUT:
