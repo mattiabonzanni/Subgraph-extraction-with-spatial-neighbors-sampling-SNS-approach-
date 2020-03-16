@@ -12,6 +12,7 @@ The spatial neighbors sampling (SNS) approach aims to retain spatial neighboring
 The definition of spatial neighbors is either based on: 
 1) node indexing (nodes whose indices are consecutive integers in a given interval as seen in the Watts-Strogatz models);
 2) Euclidian distance (nodes with coordinates within a 2D surface/3D volume as seen in the distance-dependent model and human data, respectively). 
+
 The extracted graph is an induced subgraph since it contains all the edges connecting pairs of retained nodes. 
 Differently from node, link or snowball sampling methods, we did not use any topological information of the global network during the subgraph extraction. 
 This is aimed to mimic the lack of information of the global network while optically selecting a single field-of-view during the study of neuronal network. 
