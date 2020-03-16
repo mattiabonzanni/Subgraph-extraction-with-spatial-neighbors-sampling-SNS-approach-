@@ -28,8 +28,8 @@ function [G MatrixG xcoord ycoord FinalGlobalGraph]=GenerateDDM(NG)
 % 1) avg_clus_matrix (written by Eric Bridgeford);
 % 2) avg_path_matrix (written by Eric Bridgeford);
 % 3) clustering_coef_matrix (code originally written by Mika Rubinov,UNSW, 2007-2010 and modified/written by Eric Bridgeford);
-% 4) latmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU);
-% 5) randmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU);
+% 4) latmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU; Brain Connectivity Toolbox);
+% 5) randmio_und_connected (Mika Rubinov, UNSW; Jonathan Power, WUSTL and Olaf Sporns, IU; Brain Connectivity Toolbox);
     % Written by Mattia Bonzanni and Kimberly M. Bockley
 %% Create DDN graph
 edgeDensity=input('Do you want to set the edge density of the global graph?[y/n]\n','s')
