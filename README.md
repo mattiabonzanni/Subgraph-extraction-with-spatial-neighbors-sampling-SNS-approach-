@@ -21,12 +21,15 @@ There are four folders:
 1) Spatial Neighbors Sampling approach applied to unweighted Watts-Strogatz graph
 
 Generation of binary Watts-Strogatz graphs and subgraph extraction.
+
 2) Spatial Neighbors Sampling approach applied to weighted Watts-Strogatz graph
 
 Generation of weighted Watts-Strogatz graphs and subgraph extraction.
+
 3) Spatial Neighbors Sampling approach applied Distance-Dependent Model -DDM
 
 Generation of distance-dependent graphs and subgraph extraction.
+
 4) New_Spatial Neighbors Sampling approach applied to human Data
 
 Analysis of the human coactivation matrix (Crossley et al., 2013) and subgraph extraction. 
