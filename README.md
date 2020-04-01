@@ -1,5 +1,5 @@
 # Subgraph-extraction-with-spatial-neighbors-sampling-SNS-approach-
-MATLAB codes to extract spatial neighbors from graphs
+MATLAB codes to extract spatial neighbors from graphs and raw data. 
 
   WHY:
 The analysis of real world networks is biased by the current ability to measure just a subsample of the entire network.  
@@ -38,5 +38,9 @@ Each folder contains:
 1) A function to generate a global graph and extract the subgraphs (Watts-Strogatz, unweighted and weighted) or two distinct functions to create/analyze a graph and extract subgraphs (distance-dependent model and human data);
 2) An example file;
 3) All the required codes. 
+
+There is also a raw.m structure variable which contains:
+1. Raw data for the binary and weighted Watts-Strogatz models;
+2. Graphs and coordinates for the ditance-dependent model and the human dataset.
 
 For any information, do not hesitate to contact me at mattia.bonzanni@tufts.edu or mattia.bonzanni@hotmail.it
