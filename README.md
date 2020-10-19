@@ -1,5 +1,6 @@
 # Subgraph-extraction-with-spatial-neighbors-sampling-SNS-approach-
 MATLAB codes to extract spatial neighbors from graphs and raw data. 
+
 Reference Paper:
 Bonzanni M., Bockley K., Kaplan D.L. On the effect of neuronal spatial subsampling in small-world networks, Eur J Neurosci. 2020;00:1–14.  https://doi.org/10.1111/ejn.14937
 
